@@ -39,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang='pt-br'>
       <body className={`bg-[#f4f4f4] ${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Script src='/script/new_relic.js' />
+        <Script src='/js/new_relic.js' />
         <Header userNavigation={userNavigation} navigations={navigations} />
         <main>{children}</main>
         <Footer />
