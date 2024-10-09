@@ -1,6 +1,6 @@
-import { ErrorLogInterface } from '@/types/common'
+import { IErrorLog } from '@/types/common'
 
-export const errorLog = ({ error, errorInfo }: ErrorLogInterface) => {
+export const errorLog = ({ error, errorInfo }: IErrorLog) => {
   console.error('Error encontrado: ', error)
 
   if (errorInfo) {

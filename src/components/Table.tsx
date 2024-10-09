@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { formatString } from '@/utils/commons'
 import React from 'react'
 
 interface ITable {
   headers: string[]
-  data: never[]
+  data: any[]
 }
 
 const Table = ({ headers, data }: ITable) => {
@@ -13,10 +14,7 @@ const Table = ({ headers, data }: ITable) => {
         <thead className=''>
           <tr className='border-b border-gray-400'>
             {headers.map((header, index) => (
-              <th
-                key={index}
-                className='px-4 py-2 text-left font-semibold text-black'
-              >
+              <th key={index} className='px-4 py-2 text-left font-semibold text-black'>
                 {formatString(header)}
               </th>
             ))}

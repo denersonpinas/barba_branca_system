@@ -43,8 +43,8 @@ NREUM.info = {
                   Array.isArray(e[a]) && Array.isArray(t[a])
                     ? (r[a] = Array.from(new Set([...e[a], ...t[a]])))
                     : 'object' == typeof e[a] && 'object' == typeof t[a]
-                    ? (r[a] = i(e[a], t[a]))
-                    : (r[a] = e[a])
+                      ? (r[a] = i(e[a], t[a]))
+                      : (r[a] = e[a])
                 } catch (e) {
                   ;(0, n.R)(1, e)
                 }
@@ -186,8 +186,8 @@ NREUM.info = {
                   i(t)
                     ? (e.mask_selector = ''.concat(t, ',').concat(u))
                     : '' === t || null === t
-                    ? (e.mask_selector = u)
-                    : (0, a.R)(5, t)
+                      ? (e.mask_selector = u)
+                      : (0, a.R)(5, t)
                 },
                 get block_class() {
                   return 'nr-block'
@@ -1643,7 +1643,7 @@ NREUM.info = {
     (i.f = {}),
     (i.e = (e) => Promise.all(Object.keys(i.f).reduce((t, r) => (i.f[r](e, t), t), []))),
     (i.u = (e) =>
-      ({ 212: 'nr-spa-compressor', 249: 'nr-spa-recorder', 478: 'nr-spa' }[e] + '-1.267.0.min.js')),
+      ({ 212: 'nr-spa-compressor', 249: 'nr-spa-recorder', 478: 'nr-spa' })[e] + '-1.267.0.min.js'),
     (i.o = (e, t) => Object.prototype.hasOwnProperty.call(e, t)),
     (e = {}),
     (t = 'NRBA-1.267.0.PROD:'),
@@ -1980,14 +1980,14 @@ NREUM.info = {
               return e
             })(t)
           : t
-          ? (t.c || (t = T(t.t)),
-            (t.c += 1),
-            (t.t += e),
-            (t.sos += e * e),
-            e > t.max && (t.max = e),
-            e < t.min && (t.min = e),
-            t)
-          : { t: e }
+            ? (t.c || (t = T(t.t)),
+              (t.c += 1),
+              (t.t += e),
+              (t.sos += e * e),
+              e > t.max && (t.max = e),
+              e < t.min && (t.min = e),
+              t)
+            : { t: e }
       }
       function T(e) {
         return { t: e, min: e, max: e, sos: e * e, c: 1 }
@@ -2127,10 +2127,10 @@ NREUM.info = {
         return !e || ('object' !== t && 'function' !== t)
           ? -1
           : e === h.gm
-          ? 0
-          : (0, G.I)(e, F, function () {
-              return B++
-            })
+            ? 0
+            : (0, G.I)(e, F, function () {
+                return B++
+              })
       }
       function z(e) {
         if ('string' == typeof e && e.length) return e.length
@@ -2511,10 +2511,10 @@ NREUM.info = {
                   ('string' == typeof e[0]
                     ? 0 === (t = e[0]).length && h.RI && (t = '' + h.gm.location.href)
                     : e[0] && e[0].url
-                    ? (t = e[0].url)
-                    : h.gm?.URL && e[0] && e[0] instanceof URL
-                    ? (t = e[0].href)
-                    : 'function' == typeof e[0].toString && (t = e[0].toString()),
+                      ? (t = e[0].url)
+                      : h.gm?.URL && e[0] && e[0] instanceof URL
+                        ? (t = e[0].href)
+                        : 'function' == typeof e[0].toString && (t = e[0].toString()),
                   'string' == typeof t && 0 !== t.length)
                 ) {
                   t &&
@@ -2556,8 +2556,8 @@ NREUM.info = {
                 'string' == typeof i
                   ? (r = i)
                   : 'object' == typeof i && i instanceof ge
-                  ? (r = i.url)
-                  : h.gm?.URL && 'object' == typeof i && i instanceof URL && (r = i.href),
+                    ? (r = i.url)
+                    : h.gm?.URL && 'object' == typeof i && i instanceof URL && (r = i.href),
                   ve(this, r)
                 var o = (
                   '' + ((i && i instanceof ge && i.method) || n.method || 'GET')
@@ -2600,10 +2600,10 @@ NREUM.info = {
                   return 'json' === r && null !== t
                     ? t
                     : 'arraybuffer' === r || 'blob' === r || 'json' === r
-                    ? z(e.response)
-                    : 'text' === r || '' === r || void 0 === r
-                    ? z(e.responseText)
-                    : void 0
+                      ? z(e.response)
+                      : 'text' === r || '' === r || void 0 === r
+                        ? z(e.responseText)
+                        : void 0
                 })(r, e.lastSize)
                 if ((n && (e.metrics.rxSize = n), e.sameOrigin)) {
                   var i = r.getResponseHeader('X-NewRelic-App-Data')
@@ -2684,8 +2684,13 @@ NREUM.info = {
               ;(this.time = (0, I.t)()), (this.startPath = location.pathname + location.hash)
             }),
             n.on(Ie + Ee, function (e) {
-              ;(0,
-              E.p)('bstHist', [location.pathname + location.hash, this.startPath, this.time], void 0, o.K.sessionTrace, n)
+              ;(0, E.p)(
+                'bstHist',
+                [location.pathname + location.hash, this.startPath, this.time],
+                void 0,
+                o.K.sessionTrace,
+                n
+              )
             })
           try {
             ;(i = new PerformanceObserver((e) => {

@@ -1,12 +1,10 @@
-'use client'
-
-import Script from 'next/script'
-import localFont from 'next/font/local'
 import { INavigation } from '@/types/common'
-
-import './globals.css'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
+import Script from 'next/script'
+import localFont from 'next/font/local'
+
+import './globals.css'
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -39,9 +37,9 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-br">
+    <html lang='pt-br'>
       <body className={`bg-[#f4f4f4] ${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Script src="/script/new_relic.js" />
+        <Script src='/script/new_relic.js' />
         <Header userNavigation={userNavigation} navigations={navigations} />
         <main>{children}</main>
         <Footer />

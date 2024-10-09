@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ErrorLogInterface } from '@/types/common'
+import { IErrorLog } from '@/types/common'
 import Image from 'next/image'
 
-const ErrorBoundary = ({ error, errorInfo }: ErrorLogInterface) => {
+const ErrorBoundary = ({ error, errorInfo }: IErrorLog) => {
   const router = useRouter()
 
   const handleError = useCallback(() => {
@@ -13,16 +13,16 @@ const ErrorBoundary = ({ error, errorInfo }: ErrorLogInterface) => {
     if (errorInfo) {
       console.error('Informações adicionais: ', errorInfo)
     }
-  }, [])
+  }, [error, errorInfo])
 
   const handleReload = () => router.refresh()
 
   useEffect(() => {
     handleError()
-  }, [])
+  }, [handleError])
 
   return (
-    <main className='h-screen flex justify-center items-center bg-white'>
+    <div className='h-screen flex justify-center items-center bg-white'>
       <div className='text-center'>
         <p className='text-base font-semibold text-orange-600'>404</p>
         <Image width={350} height={350} src={'/image/error.png'} alt='Error' />
@@ -39,15 +39,12 @@ const ErrorBoundary = ({ error, errorInfo }: ErrorLogInterface) => {
           >
             Voltar para home
           </a>
-          <button
-            onClick={() => handleReload()}
-            className='text-sm font-semibold text-gray-900'
-          >
+          <button onClick={() => handleReload()} className='text-sm font-semibold text-gray-900'>
             Recarregar a página <span aria-hidden='true'>&rarr;</span>
           </button>
         </div>
       </div>
-    </main>
+    </div>
   )
 }
 

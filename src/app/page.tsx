@@ -1,4 +1,4 @@
-import { axiosApi } from '@/lib/axios_config'
+import { GetClients } from '@/service/getClients'
 import { HomeTemplate } from '@/template/Home'
 import { ICLient } from '@/types/common'
 import { Metadata } from 'next'
@@ -13,11 +13,9 @@ export default async function Home() {
   return <HomeTemplate data={data} />
 }
 
-export const getData = async () => {
-  const { data } = await axiosApi.get('/clientes')
+async function getData() {
+  const { data } = await GetClients()
 
-  if (!data || data.length == 0) throw new Error('Falha na requisição!')
-
-  const cliente: ICLient[] = data
+  const cliente: ICLient[] = data || []
   return cliente
 }

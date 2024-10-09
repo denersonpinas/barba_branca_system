@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "NODE_ENV=production node src/server/index.js",
     "lint": "next lint",
-    "prettier": "yarn prettier . --write",
+    "style": "yarn prettier . --write",
     "start:server": "json-server -p 8000 ./fake_server/db.json"
   },
   "dependencies": {
