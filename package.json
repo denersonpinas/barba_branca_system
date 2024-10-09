@@ -8,7 +8,9 @@
     "start": "NODE_ENV=production node src/server/index.js",
     "lint": "next lint",
     "style": "yarn prettier . --write",
-    "start:server": "json-server -p 8000 ./fake_server/db.json"
+    "start:server": "json-server -p 8000 ./fake_server/db.json",
+    "prepare": "husky install",
+    "fix": "yarn style && next lint"
   },
   "dependencies": {
     "axios": "^1.7.7",
@@ -25,6 +27,7 @@
     "eslint-config-next": "14.2.15",
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.10.0",
+    "husky": "^9.1.6",
     "postcss": "^8",
     "prettier": "^3.3.3",
     "tailwindcss": "^3.4.1",
