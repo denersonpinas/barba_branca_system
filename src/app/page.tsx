@@ -14,8 +14,8 @@ export default async function Home() {
 }
 
 async function getData() {
-  const { data } = await GetClients()
+  const data: ICLient[] = await GetClients()
 
-  const cliente: ICLient[] = data || []
+  const cliente = data || []
   return cliente
 }
