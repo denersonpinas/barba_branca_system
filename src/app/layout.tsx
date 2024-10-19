@@ -1,3 +1,8 @@
+/* eslint-disable react/react-in-jsx-scope */
+'use client'
+
+import { usePathname } from 'next/navigation'
+
 import { INavigation } from '@/types/common'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
@@ -18,7 +23,7 @@ const geistMono = localFont({
 })
 
 const navigations: INavigation[] = [
-  { id: 1, name: 'Home', to: '/', current: true },
+  { id: 1, name: 'Clientes', to: '/', current: true },
   { id: 2, name: 'Team', to: '#', current: false },
   { id: 3, name: 'Projects', to: '#', current: false },
   { id: 4, name: 'Calendar', to: '#', current: false },
@@ -36,12 +41,20 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const pathname = usePathname()
+
+  const navigation = navigations.find((item) => item.to === pathname)
+
   return (
     <html lang='pt-br'>
       <body className={`bg-[#f4f4f4] ${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Script src='/js/new_relic.js' />
-        <Header userNavigation={userNavigation} navigations={navigations} />
-        <main>{children}</main>
+        <Header
+          userNavigation={userNavigation}
+          navigations={navigations}
+          namePage={navigation?.name || ''}
+        />
+        <main className='w-full flex flex-col justify-center items-center'>{children}</main>
         <Footer />
       </body>
     </html>

@@ -1,6 +1,7 @@
+/* eslint-disable react/react-in-jsx-scope */
 export default function NotFoundPage() {
   return (
-    <main className='h-screen flex justify-center items-center place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8'>
+    <main className='w-full h-screen flex justify-center items-center place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8'>
       <div className='text-center'>
         <p className='text-base font-semibold text-orange-600'>404</p>
         <h1 className='mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl'>

@@ -11,11 +11,3 @@ export interface IErrorLog {
   error: Error
   errorInfo?: ErrorInfo
 }
-
-export interface ICLient {
-  id: string
-  nome: string
-  whatsapp: string
-  cpf: string
-  data_nacimento: string
-}

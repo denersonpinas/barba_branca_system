@@ -1,3 +1,4 @@
+/* eslint-disable react/react-in-jsx-scope */
 'use client'
 
 import { INavigation } from '@/types/common'
@@ -8,9 +9,10 @@ import { useState } from 'react'
 interface HeaderInterface {
   userNavigation: INavigation[]
   navigations: INavigation[]
+  namePage: string
 }
 
-export const Header = ({ userNavigation, navigations }: HeaderInterface) => {
+export const Header = ({ userNavigation, navigations, namePage }: HeaderInterface) => {
   const [isOpenUserNavigation, setIsOpenUserNavigation] = useState(false)
   const [isOpenNavigation, setIsOpenNavigation] = useState(false)
 
@@ -256,7 +258,7 @@ export const Header = ({ userNavigation, navigations }: HeaderInterface) => {
 
       <header className='bg-white shadow'>
         <div className='mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8'>
-          <h1 className='text-3xl font-bold tracking-tight text-orange-900'>Home</h1>
+          <h1 className='text-3xl font-bold tracking-tight text-orange-900'>{namePage}</h1>
         </div>
       </header>
     </>

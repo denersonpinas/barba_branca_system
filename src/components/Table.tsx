@@ -1,13 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { formatString } from '@/utils/commons'
 import React from 'react'
+import { MdRemove } from 'react-icons/md'
 
 interface ITable {
   headers: string[]
   data: any[]
+  onRemove: (client: any) => void
 }
 
-const Table = ({ headers, data }: ITable) => {
+export const Table = ({ headers, data, onRemove }: ITable) => {
   return (
     <div className='overflow-x-auto'>
       <table className='min-w-full table-auto'>
@@ -28,6 +31,14 @@ const Table = ({ headers, data }: ITable) => {
                   {row[header]}
                 </td>
               ))}
+              <td className='px-4 py-2'>
+                <button
+                  onClick={() => onRemove(row)}
+                  className='bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded'
+                >
+                  <MdRemove size={14} />
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -35,5 +46,3 @@ const Table = ({ headers, data }: ITable) => {
     </div>
   )
 }
-
-export default Table

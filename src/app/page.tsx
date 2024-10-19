@@ -1,6 +1,7 @@
-import { GetClients } from '@/service/getClients'
+/* eslint-disable react/react-in-jsx-scope */
+import { GetClients } from '@/service/client'
 import { HomeTemplate } from '@/template/Home'
-import { ICLient } from '@/types/common'
+import { IClient } from '@/types/client'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -9,12 +10,12 @@ export const metadata: Metadata = {
 }
 
 export default async function Home() {
-  const data: ICLient[] = await getData()
+  const data: IClient[] = await getData()
   return <HomeTemplate data={data} />
 }
 
 async function getData() {
-  const data: ICLient[] = await GetClients()
+  const data: IClient[] = await GetClients()
 
   const cliente = data || []
   return cliente
