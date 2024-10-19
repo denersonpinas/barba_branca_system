@@ -12,3 +12,9 @@ export interface IClientRepository {
   cpf: string
   data_nacimento: string
 }
+
+export interface IClientResponse {
+  success: boolean
+  data: IClient | object
+  status: number
+}

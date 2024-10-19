@@ -1,5 +1,5 @@
 import { axiosApi } from '@/lib/axios_config'
-import { IClient, IClientRepository } from '@/types/client'
+import { IClient, IClientRepository, IClientResponse } from '@/types/client'
 
 // Get clients
 export async function GetClients() {
@@ -25,13 +25,14 @@ export async function DeleteClient(id: string) {
 }
 
 // Post clients
-export async function PostClient(data: IClientRepository) {
+export async function PostClient(data: IClientRepository): Promise<IClientResponse> {
   try {
     const response = await axiosApi.post('/clientes', data)
+
     const dataResponse: IClient = response.data
-    return dataResponse
+    return { success: true, data: dataResponse, status: response.status }
   } catch (error) {
     console.error('Erro econtrado: ', error)
-    return []
+    return { success: true, data: {}, status: 500 }
   }
 }

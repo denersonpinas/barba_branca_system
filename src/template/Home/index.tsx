@@ -5,7 +5,7 @@ import { Table } from '@/components/Table'
 import Input from '@/components/ui/Input'
 import { useErrors } from '@/hook/useErrors'
 import { DeleteClient, PostClient } from '@/service/client'
-import { IClient, IClientRepository } from '@/types/client'
+import { IClient, IClientRepository, IClientResponse } from '@/types/client'
 import { useRouter } from 'next/navigation'
 import { ChangeEvent, FormEvent, useState } from 'react'
 import { MdPhone } from 'react-icons/md'
@@ -105,15 +105,16 @@ export const HomeTemplate = ({ data }: IHomeTemplate) => {
 
     const data: IClientRepository = { nome: name, whatsapp: phone, cpf, data_nacimento: birthday }
 
-    const response: IClient | never[] = await PostClient(data)
+    const response: IClientResponse = await PostClient(data)
 
-    if (response?.id) {
+    if (response.success) {
       console.log('Success: ', response)
 
       setName('')
       setPhone('')
       setCpf('')
       setBirthday('')
+      router.refresh()
     } else {
       console.error('Error: encontramos um error na requisição.')
     }
