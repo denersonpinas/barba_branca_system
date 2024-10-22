@@ -1,13 +1,15 @@
 /* eslint-disable react/react-in-jsx-scope */
 'use client'
 
+import { ChangeEvent, FormEvent, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { cpf as cpfValidator } from 'cpf-cnpj-validator'
+import { useErrors } from '@/hook/useErrors'
 import { Table } from '@/components/Table'
 import Input from '@/components/ui/Input'
-import { useErrors } from '@/hook/useErrors'
 import { DeleteClient, PostClient } from '@/service/client'
 import { IClient, IClientRepository, IClientResponse } from '@/types/client'
-import { useRouter } from 'next/navigation'
-import { ChangeEvent, FormEvent, useState } from 'react'
+import { maskBirthday, maskCpf, maskPhone, removeMask } from '@/utils/mask'
 import { MdPhone } from 'react-icons/md'
 
 interface IHomeTemplate {
@@ -19,7 +21,8 @@ const header = ['nome', 'whatsapp', 'cpf', 'data_nacimento', '']
 const textErrorMessage = {
   name: 'Informe o nome completo',
   cpf: 'Informe um CPF válido',
-  phone: 'Informe um telefone válido'
+  phone: 'Informe um telefone válido',
+  bithday: 'Informe uma data de nascimento válida'
 }
 
 export const HomeTemplate = ({ data }: IHomeTemplate) => {
@@ -29,6 +32,7 @@ export const HomeTemplate = ({ data }: IHomeTemplate) => {
   const [birthday, setBirthday] = useState<string>('')
   const [client, setClient] = useState<IClient>()
   const [isOpen, setIsOpen] = useState(false)
+
   const { setError, getErrorMessageByFieldName, removeError } = useErrors()
   const router = useRouter()
 
@@ -46,6 +50,38 @@ export const HomeTemplate = ({ data }: IHomeTemplate) => {
      */
     const fullNameRegex = /(^[a-zA-Z]{3,})(\s+[a-zA-Z]{2,})+$/
     return fullNameRegex.test(name.trim())
+  }
+
+  const limitedDateToday = () => {
+    const today = new Date().toLocaleDateString()
+    const cleanToday = removeMask(today)
+    return maskBirthday(cleanToday)
+  }
+
+  const minimumDate = () => {
+    const date = new Date()
+    return `${date.getFullYear() - 100}-${date.getMonth() < 10 ? '0' : ''}${date.getMonth()}-${date.getDate()}`
+  }
+
+  const isValidDate = (date: string) => {
+    /**
+     * Validate if Date is small year actual or large year actual less 100
+     * :params  - date is string
+     * :return  - boolean
+     */
+
+    const [year, month, day] = date.split('-')
+    const selectedDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+    const today = new Date()
+
+    // Verify if date is not large year actual
+    if (selectedDate > today) return false
+
+    // Verify if date is not small year minimum (year actual - 100)
+    const minimumDate = new Date(today.getFullYear() - 100, today.getMonth(), today.getDate())
+    if (selectedDate < minimumDate) return false
+
+    return true
   }
 
   const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -79,6 +115,101 @@ export const HomeTemplate = ({ data }: IHomeTemplate) => {
     }
 
     setName(nameClean)
+  }
+
+  const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
+    /**
+     * Verify if the phone is valid
+     * :params  - event
+     * :return  - void
+     */
+    e.preventDefault()
+
+    const isBlur = e.type === 'blur'
+    const isTouched = e.currentTarget.dataset.touched
+
+    const phoneClean = removeMask(e.target.value)
+
+    if (isBlur && !isTouched) {
+      e.currentTarget.dataset.touched = 'true'
+      if (phoneClean.length < 11) {
+        setError({ field: 'phone', message: textErrorMessage.phone })
+      }
+    }
+
+    if ((!isBlur && isTouched) || phoneClean.length === 11) {
+      if (phoneClean.length < 11) {
+        setError({ field: 'phone', message: textErrorMessage.phone })
+      } else {
+        removeError('phone')
+      }
+    }
+
+    setPhone(maskPhone(phoneClean))
+  }
+
+  const handleCpfChange = (e: ChangeEvent<HTMLInputElement>) => {
+    /**
+     * Verify if the CPF is valid
+     * :params  - event
+     * :return  - void
+     */
+    e.preventDefault()
+
+    const isBlur = e.type === 'blur'
+    const isTouched = e.currentTarget.dataset.touched
+    const cpfClean = removeMask(e.target.value)
+
+    if (isBlur && !isTouched) {
+      e.currentTarget.dataset.touched = 'true'
+      const isValidCpf = cpfValidator.isValid(cpfClean)
+
+      if (!isValidCpf) {
+        setError({ field: 'cpf', message: textErrorMessage.cpf })
+      }
+    }
+
+    if (!isBlur && isTouched) {
+      const isValidCpf = cpfValidator.isValid(cpfClean)
+
+      if (!isValidCpf) {
+        setError({ field: 'cpf', message: textErrorMessage.cpf })
+      } else {
+        removeError('cpf')
+      }
+    }
+
+    setCpf(maskCpf(cpfClean))
+  }
+
+  const handleBirthdayChange = (e: ChangeEvent<HTMLInputElement>) => {
+    /**
+     * Verify if the birthday is valid
+     * :params  - event
+     * :return  - void
+     */
+    e.preventDefault()
+
+    const isBlur = e.type === 'blur'
+    const isTouched = e.currentTarget.dataset.touched
+    const isValidatedDate = isValidDate(e.target.value)
+
+    if (isBlur && !isTouched) {
+      e.currentTarget.dataset.touched = 'true'
+      if (!isValidatedDate) {
+        setError({ field: 'bithday', message: textErrorMessage.bithday })
+      }
+    }
+
+    if (!isBlur && isTouched) {
+      if (!isValidatedDate) {
+        setError({ field: 'bithday', message: textErrorMessage.bithday })
+      } else {
+        removeError('bithday')
+      }
+    }
+
+    setBirthday(e.target.value)
   }
 
   const handleModal = (client: IClient) => {
@@ -134,18 +265,37 @@ export const HomeTemplate = ({ data }: IHomeTemplate) => {
               onBlur={(e) => handleNameChange(e)}
               error={getErrorMessageByFieldName('name')}
               value={name}
+              ariaLabel='Nome'
             />
             <Input
               label='Whatsapp'
               icon={<MdPhone size={14} />}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => handlePhoneChange(e)}
+              onBlur={(e) => handlePhoneChange(e)}
+              error={getErrorMessageByFieldName('phone')}
               value={phone}
+              ariaLabel='Whatsapp'
+              maxLength={16}
             />
-            <Input label='Cpf' onChange={(e) => setCpf(e.target.value)} value={cpf} />
+            <Input
+              label='Cpf'
+              onChange={(e) => handleCpfChange(e)}
+              onBlur={(e) => handleCpfChange(e)}
+              error={getErrorMessageByFieldName('cpf')}
+              ariaLabel='Cpf'
+              value={cpf}
+              maxLength={14}
+            />
             <Input
               label='Data Nacimento'
-              onChange={(e) => setBirthday(e.target.value)}
+              type='date'
+              onChange={(e) => handleBirthdayChange(e)}
+              onBlur={(e) => handleBirthdayChange(e)}
+              error={getErrorMessageByFieldName('bithday')}
+              ariaLabel='Data de Nascimento'
               value={birthday}
+              max={limitedDateToday()}
+              min={minimumDate()}
             />
           </fieldset>
           <div className='w-1/3 flex flex-col gap-2'>
