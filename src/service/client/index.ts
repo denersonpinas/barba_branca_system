@@ -36,3 +36,16 @@ export async function PostClient(data: IClientRepository): Promise<IClientRespon
     return { success: true, data: {}, status: 500 }
   }
 }
+
+// Upload clients
+export async function UpdateClient(data: IClientRepository, id: string): Promise<IClientResponse> {
+  try {
+    const response = await axiosApi.put(`/clientes/${id}`, data)
+
+    const dataResponse: IClient = response.data
+    return { success: true, data: dataResponse, status: response.status }
+  } catch (error) {
+    console.error('Erro econtrado: ', error)
+    return { success: true, data: {}, status: 500 }
+  }
+}

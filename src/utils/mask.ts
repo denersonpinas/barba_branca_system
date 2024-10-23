@@ -11,6 +11,6 @@ export const maskCpf = (cpf: string) =>
   cpf.replace(/[^\d]/g, '').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
 
 export const maskBirthday = (birthday: string) =>
-  birthday.replace(/(\d{2})(\d{2})(\d{4})/, '$3-$2-$1')
+  birthday.replace(/(\d{4})(\d{2})(\d{2})/, '$3-$2-$1')
 
 export const removeMask = (mask: string) => mask.replace(/\D/g, '')

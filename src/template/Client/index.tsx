@@ -7,7 +7,7 @@ import { cpf as cpfValidator } from 'cpf-cnpj-validator'
 import { useErrors } from '@/hook/useErrors'
 import { Table } from '@/components/Table'
 import Input from '@/components/ui/Input'
-import { DeleteClient, PostClient } from '@/service/client'
+import { DeleteClient, PostClient, UpdateClient } from '@/service/client'
 import { IClient, IClientRepository, IClientResponse } from '@/types/client'
 import { maskBirthday, maskCpf, maskPhone, removeMask } from '@/utils/mask'
 import { MdPhone } from 'react-icons/md'
@@ -25,15 +25,17 @@ const textErrorMessage = {
   bithday: 'Informe uma data de nascimento válida'
 }
 
-export const HomeTemplate = ({ data }: IHomeTemplate) => {
+export const ClientTemplate = ({ data }: IHomeTemplate) => {
+  const [id, setId] = useState<string>('')
   const [name, setName] = useState<string>('')
   const [phone, setPhone] = useState<string>('')
   const [cpf, setCpf] = useState<string>('')
   const [birthday, setBirthday] = useState<string>('')
   const [client, setClient] = useState<IClient>()
   const [isOpen, setIsOpen] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false)
 
-  const { setError, getErrorMessageByFieldName, removeError } = useErrors()
+  const { errors, setError, getErrorMessageByFieldName, removeError } = useErrors()
   const router = useRouter()
 
   const cleanAndNormalizeString = (str: string) => {
@@ -54,8 +56,8 @@ export const HomeTemplate = ({ data }: IHomeTemplate) => {
 
   const limitedDateToday = () => {
     const today = new Date().toLocaleDateString()
-    const cleanToday = removeMask(today)
-    return maskBirthday(cleanToday)
+    const [day, month, year] = today.split('/')
+    return `${year}-${month}-${day}`
   }
 
   const minimumDate = () => {
@@ -82,6 +84,25 @@ export const HomeTemplate = ({ data }: IHomeTemplate) => {
     if (selectedDate < minimumDate) return false
 
     return true
+  }
+
+  const isValidatedClient = (dataList: string[] | number[]) => {
+    let response = true
+    dataList.map((data) => {
+      if (!data) response = false
+    })
+    return response
+  }
+
+  const handleApresentationData = (data: IClient[]) => {
+    const formatedData = data.map((client) => ({
+      id: client.id,
+      nome: client.nome,
+      whatsapp: maskPhone(client.whatsapp),
+      cpf: maskCpf(client.cpf),
+      data_nacimento: maskBirthday(client.data_nacimento)
+    }))
+    return formatedData
   }
 
   const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -219,6 +240,19 @@ export const HomeTemplate = ({ data }: IHomeTemplate) => {
     }
   }
 
+  const handleUpdateClient = (client: IClient) => {
+    /** Update client */
+    const { data_nacimento } = client
+    const [day, month, year] = data_nacimento.split('-')
+
+    setId(client.id)
+    setName(client.nome)
+    setPhone(client.whatsapp)
+    setCpf(client.cpf)
+    setBirthday(`${year}-${month}-${day}`)
+    setIsUpdating(true)
+  }
+
   const handleRemoveClient = async () => {
     if (client?.id) {
       const response = await DeleteClient(client.id)
@@ -231,91 +265,211 @@ export const HomeTemplate = ({ data }: IHomeTemplate) => {
     }
   }
 
+  const handleReset = () => {
+    /** Reset inputs of the form */
+    setId('')
+    setName('')
+    setPhone('')
+    setCpf('')
+    setBirthday('')
+    setIsUpdating(false)
+
+    removeError('name')
+    removeError('phone')
+    removeError('cpf')
+    removeError('bithday')
+  }
+
   const handleSendClient = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    const data: IClientRepository = { nome: name, whatsapp: phone, cpf, data_nacimento: birthday }
+    const data: IClientRepository = {
+      nome: name,
+      whatsapp: removeMask(phone),
+      cpf: removeMask(cpf),
+      data_nacimento: removeMask(birthday)
+    }
+    const isValidClient = isValidatedClient([name, phone, cpf, birthday])
 
-    const response: IClientResponse = await PostClient(data)
+    if (errors.length === 0 && isValidClient) {
+      const response: IClientResponse = await PostClient(data)
 
-    if (response.success) {
-      console.log('Success: ', response)
+      if (response.success) {
+        console.log('Success: ', response)
 
-      setName('')
-      setPhone('')
-      setCpf('')
-      setBirthday('')
-      router.refresh()
-    } else {
-      console.error('Error: encontramos um error na requisição.')
+        setName('')
+        setPhone('')
+        setCpf('')
+        setBirthday('')
+        router.refresh()
+      } else {
+        console.error('Error: encontramos um error na requisição.')
+      }
+    }
+  }
+
+  const handleSendUpdateClient = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    const data: IClientRepository = {
+      nome: name,
+      whatsapp: removeMask(phone),
+      cpf: removeMask(cpf),
+      data_nacimento: removeMask(birthday)
+    }
+    const isValidClient = isValidatedClient([name, phone, cpf, birthday])
+
+    if (errors.length === 0 && isValidClient) {
+      const response: IClientResponse = await UpdateClient(data, id)
+
+      if (response.success) {
+        console.log('Success: ', response)
+
+        setName('')
+        setPhone('')
+        setCpf('')
+        setBirthday('')
+        router.refresh()
+      } else {
+        console.error('Error: encontramos um error na requisição.')
+      }
     }
   }
 
   return (
     <div className='w-full max-w-7xl flex flex-col justify-center items-center gap-8 px-4 py-6 pt-16 pb-16 sm:px-6 lg:px-8'>
-      <section className='w-full'>
-        <form
-          className='w-full flex gap-4 p-4 bg-white rounded-lg shadow-md'
-          onSubmit={(e) => handleSendClient(e)}
-        >
-          <fieldset className='w-full flex gap-4'>
-            <Input
-              label='Nome Completo'
-              onChange={(e) => handleNameChange(e)}
-              onBlur={(e) => handleNameChange(e)}
-              error={getErrorMessageByFieldName('name')}
-              value={name}
-              ariaLabel='Nome'
-            />
-            <Input
-              label='Whatsapp'
-              icon={<MdPhone size={14} />}
-              onChange={(e) => handlePhoneChange(e)}
-              onBlur={(e) => handlePhoneChange(e)}
-              error={getErrorMessageByFieldName('phone')}
-              value={phone}
-              ariaLabel='Whatsapp'
-              maxLength={16}
-            />
-            <Input
-              label='Cpf'
-              onChange={(e) => handleCpfChange(e)}
-              onBlur={(e) => handleCpfChange(e)}
-              error={getErrorMessageByFieldName('cpf')}
-              ariaLabel='Cpf'
-              value={cpf}
-              maxLength={14}
-            />
-            <Input
-              label='Data Nacimento'
-              type='date'
-              onChange={(e) => handleBirthdayChange(e)}
-              onBlur={(e) => handleBirthdayChange(e)}
-              error={getErrorMessageByFieldName('bithday')}
-              ariaLabel='Data de Nascimento'
-              value={birthday}
-              max={limitedDateToday()}
-              min={minimumDate()}
-            />
-          </fieldset>
-          <div className='w-1/3 flex flex-col gap-2'>
-            <button
-              type='submit'
-              className='flex w-full justify-center rounded-md bg-orange-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-orange-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600'
-            >
-              Salvar
-            </button>
-            <button
-              type='button'
-              className='flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-orange-600 hover:text-orange-500'
-            >
-              Cancelar
-            </button>
-          </div>
-        </form>
+      <section className='w-full p-4 bg-white rounded-lg shadow-md '>
+        {!isUpdating ? (
+          <form
+            className='w-full flex flex-col gap-4 sm:flex-row'
+            onSubmit={(e) => handleSendClient(e)}
+          >
+            <fieldset className='w-full flex flex-col gap-2 sm:flex-row'>
+              <Input
+                label='Nome Completo'
+                onChange={(e) => handleNameChange(e)}
+                onBlur={(e) => handleNameChange(e)}
+                error={getErrorMessageByFieldName('name')}
+                value={name}
+                ariaLabel='Nome'
+              />
+              <Input
+                label='Whatsapp'
+                icon={<MdPhone size={14} />}
+                onChange={(e) => handlePhoneChange(e)}
+                onBlur={(e) => handlePhoneChange(e)}
+                error={getErrorMessageByFieldName('phone')}
+                value={phone}
+                ariaLabel='Whatsapp'
+                maxLength={16}
+              />
+              <Input
+                label='Cpf'
+                onChange={(e) => handleCpfChange(e)}
+                onBlur={(e) => handleCpfChange(e)}
+                error={getErrorMessageByFieldName('cpf')}
+                ariaLabel='Cpf'
+                value={cpf}
+                maxLength={14}
+              />
+              <Input
+                label='Data Nacimento'
+                type='date'
+                onChange={(e) => handleBirthdayChange(e)}
+                onBlur={(e) => handleBirthdayChange(e)}
+                error={getErrorMessageByFieldName('bithday')}
+                ariaLabel='Data de Nascimento'
+                value={birthday}
+                max={limitedDateToday()}
+                min={minimumDate()}
+              />
+            </fieldset>
+            <div className='w-full sm:w-1/3 flex flex-col gap-2'>
+              <button
+                type='submit'
+                className='flex w-full justify-center rounded-md bg-orange-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-orange-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600'
+              >
+                Salvar
+              </button>
+              <button
+                type='button'
+                className='flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-orange-600 hover:text-orange-500'
+                onClick={() => handleReset()}
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        ) : (
+          <form
+            className='w-full flex flex-col gap-4 sm:flex-row'
+            onSubmit={(e) => handleSendUpdateClient(e)}
+          >
+            <fieldset className='w-full flex flex-col gap-2 sm:flex-row'>
+              <Input
+                label='Nome Completo'
+                onChange={(e) => handleNameChange(e)}
+                onBlur={(e) => handleNameChange(e)}
+                error={getErrorMessageByFieldName('name')}
+                value={name}
+                ariaLabel='Nome'
+              />
+              <Input
+                label='Whatsapp'
+                icon={<MdPhone size={14} />}
+                onChange={(e) => handlePhoneChange(e)}
+                onBlur={(e) => handlePhoneChange(e)}
+                error={getErrorMessageByFieldName('phone')}
+                value={phone}
+                ariaLabel='Whatsapp'
+                maxLength={16}
+              />
+              <Input
+                label='Cpf'
+                onChange={(e) => handleCpfChange(e)}
+                onBlur={(e) => handleCpfChange(e)}
+                error={getErrorMessageByFieldName('cpf')}
+                ariaLabel='Cpf'
+                value={cpf}
+                maxLength={14}
+              />
+              <Input
+                label='Data Nacimento'
+                type='date'
+                onChange={(e) => handleBirthdayChange(e)}
+                onBlur={(e) => handleBirthdayChange(e)}
+                error={getErrorMessageByFieldName('bithday')}
+                ariaLabel='Data de Nascimento'
+                value={birthday}
+                max={limitedDateToday()}
+                min={minimumDate()}
+              />
+            </fieldset>
+            <div className='w-full sm:w-1/3 flex flex-col gap-2'>
+              <button
+                type='submit'
+                className='flex w-full justify-center rounded-md bg-orange-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-orange-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600'
+              >
+                Atualizar
+              </button>
+              <button
+                type='button'
+                className='flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-orange-600 hover:text-orange-500'
+                onClick={() => handleReset()}
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        )}
       </section>
       <div className='w-full justify-center items-center'>
-        <Table headers={header} data={data} onRemove={(client) => handleModal(client)} />
+        <Table
+          headers={header}
+          data={handleApresentationData(data)}
+          onRemove={(client) => handleModal(client)}
+          onEdit={(client) => handleUpdateClient(client)}
+        />
       </div>
 
       {isOpen && (

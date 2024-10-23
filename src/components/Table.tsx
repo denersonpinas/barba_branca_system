@@ -2,15 +2,16 @@
 
 import { formatString } from '@/utils/commons'
 import React from 'react'
-import { MdRemove } from 'react-icons/md'
+import { MdEdit, MdRemove } from 'react-icons/md'
 
 interface ITable {
   headers: string[]
   data: any[]
-  onRemove: (client: any) => void
+  onRemove?: (client: any) => void
+  onEdit?: (client: any) => void
 }
 
-export const Table = ({ headers, data, onRemove }: ITable) => {
+export const Table = ({ headers, data, onRemove, onEdit }: ITable) => {
   return (
     <div className='overflow-x-auto'>
       <table className='min-w-full table-auto'>
@@ -31,14 +32,26 @@ export const Table = ({ headers, data, onRemove }: ITable) => {
                   {row[header]}
                 </td>
               ))}
-              <td className='px-4 py-2'>
-                <button
-                  onClick={() => onRemove(row)}
-                  className='bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded'
-                >
-                  <MdRemove size={14} />
-                </button>
-              </td>
+              {(onRemove || onEdit) && (
+                <td className='flex gap-2 px-4 py-2'>
+                  {onRemove && (
+                    <button
+                      onClick={() => onRemove(row)}
+                      className='bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded'
+                    >
+                      <MdRemove size={14} />
+                    </button>
+                  )}
+                  {onEdit && (
+                    <button
+                      onClick={() => onEdit(row)}
+                      className='bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded'
+                    >
+                      <MdEdit size={14} />
+                    </button>
+                  )}
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
